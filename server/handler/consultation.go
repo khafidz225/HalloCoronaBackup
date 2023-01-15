@@ -66,17 +66,18 @@ func (h *handlerConsultation) CreateConsultation(w http.ResponseWriter, r *http.
 	dateconsul, _ := time.Parse("2006-01-02", r.FormValue("dateconsul"))
 
 	request := consultationdto.ConsultationRequest{
-		Fullname:    r.FormValue("fullname"),
-		Phone:       r.FormValue("phone"),
-		BornDate:    borndate,
-		Age:         age,
-		Height:      height,
-		Weight:      weight,
-		Gender:      r.FormValue("gender"),
-		Subject:     r.FormValue("subject"),
-		DateConsul:  dateconsul,
-		Description: r.FormValue("description"),
-		UserID:      userId,
+		Fullname:     r.FormValue("fullname"),
+		Phone:        r.FormValue("phone"),
+		BornDate:     borndate,
+		Age:          age,
+		Height:       height,
+		Weight:       weight,
+		Gender:       r.FormValue("gender"),
+		Subject:      r.FormValue("subject"),
+		SelectDoctor: r.FormValue("selectdoctor"),
+		DateConsul:   dateconsul,
+		Description:  r.FormValue("description"),
+		UserID:       userId,
 	}
 
 	validation := validator.New()
@@ -89,18 +90,19 @@ func (h *handlerConsultation) CreateConsultation(w http.ResponseWriter, r *http.
 	}
 
 	consultation := models.Consultation{
-		Fullname:    request.Fullname,
-		Phone:       request.Phone,
-		BornDate:    request.BornDate,
-		Age:         request.Age,
-		Height:      request.Height,
-		Weight:      request.Weight,
-		Gender:      request.Gender,
-		Subject:     request.Subject,
-		DateConsul:  request.DateConsul,
-		Description: request.Description,
-		UserID:      request.UserID,
-		Status:      "Waiting Approve Consultation Live",
+		Fullname:     request.Fullname,
+		Phone:        request.Phone,
+		BornDate:     request.BornDate,
+		Age:          request.Age,
+		Height:       request.Height,
+		Weight:       request.Weight,
+		Gender:       request.Gender,
+		Subject:      request.Subject,
+		SelectDoctor: request.SelectDoctor,
+		DateConsul:   request.DateConsul,
+		Description:  request.Description,
+		UserID:       request.UserID,
+		Status:       "Waiting Approve Consultation Live",
 	}
 
 	data, err := h.ConsultationRepository.CreateConsultation(consultation)
@@ -130,21 +132,22 @@ func (h *handlerConsultation) UpdateConsultation(w http.ResponseWriter, r *http.
 	weight, _ := strconv.Atoi(r.FormValue("weight"))
 	dateconsul, _ := time.Parse("2006-01-02", r.FormValue("dateconsul"))
 	request := consultationdto.ConsultationRequest{
-		Fullname:    r.FormValue("fullname"),
-		Phone:       r.FormValue("phone"),
-		BornDate:    born,
-		Age:         age,
-		Height:      height,
-		Weight:      weight,
-		Gender:      r.FormValue("gender"),
-		Subject:     r.FormValue("subject"),
-		DateConsul:  dateconsul,
-		Description: r.FormValue("description"),
-		Status:      r.FormValue("status"),
-		Reply:       r.FormValue("reply"),
-		Link:        "https://meet.google.com/new",
-		UpdateAt:    time.Now(),
-		Doctor:      r.FormValue("doctor"),
+		Fullname:     r.FormValue("fullname"),
+		Phone:        r.FormValue("phone"),
+		BornDate:     born,
+		Age:          age,
+		Height:       height,
+		Weight:       weight,
+		Gender:       r.FormValue("gender"),
+		Subject:      r.FormValue("subject"),
+		SelectDoctor: r.FormValue("selectdoctor"),
+		DateConsul:   dateconsul,
+		Description:  r.FormValue("description"),
+		Status:       r.FormValue("status"),
+		Reply:        r.FormValue("reply"),
+		Link:         "https://meet.google.com/new",
+		UpdateAt:     time.Now(),
+		Doctor:       r.FormValue("doctor"),
 	}
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	consultation, err := h.ConsultationRepository.GetConsultation(int(id))
