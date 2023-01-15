@@ -20,6 +20,7 @@ type UserResponse struct {
 	Phone    string `json:"phone" form:"phone"`
 	Address  string `json:"address" form:"address"`
 	Role     string `json:"role" form:"role"`
+	Image    string `json:"image" form:"image"`
 }
 
 func (UserResponse) TableName() string {
