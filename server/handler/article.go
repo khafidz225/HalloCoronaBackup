@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	articledto "server/dto/article"
 	dto "server/dto/result"
@@ -9,12 +11,14 @@ import (
 	"server/repositories"
 	"strconv"
 
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/go-playground/validator"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
 )
 
-var path_file = "http://localhost:5000/uploads/"
+// var path_file = "http://localhost:5000/uploads/"
 
 type handlerArticle struct {
 	ArticleRepository repositories.ArticleRepository
@@ -34,7 +38,7 @@ func (h *handlerArticle) FindArticle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for i, d := range article {
-		article[i].Image = path_file + d.Image
+		article[i].Image = d.Image
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -54,7 +58,6 @@ func (h *handlerArticle) GetArticle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	article.Image = path_file + article.Image
 	w.WriteHeader(http.StatusOK)
 	response := dto.SuccessResult{Code: http.StatusOK, Data: article}
 	json.NewEncoder(w).Encode(response)
@@ -66,11 +69,10 @@ func (h *handlerArticle) AddArticle(w http.ResponseWriter, r *http.Request) {
 	userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
 	userId := int(userInfo["id"].(float64))
 
-	dataContex := r.Context().Value("dataFile") // add this code
-	filename := dataContex.(string)             // add this code
+	dataContex := r.Context().Value("dataFile")
+	filepath := dataContex.(string) // add this code
 	request := articledto.ArticleRequest{
 		Title:       r.FormValue("title"),
-		Image:       filename,
 		Description: r.FormValue("description"),
 		UserID:      userId,
 	}
@@ -82,9 +84,20 @@ func (h *handlerArticle) AddArticle(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 		return
 	}
+
+	var ctx = context.Background()
+	var CLOUD_NAME = "dfxarsquq"
+	var API_KEY = "424662388976554"
+	var API_SECRET = "izwGO6NvRBu5pNVJoPyp2j1oNC4"
+
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "HalloCorona"})
+	fmt.Println(resp.SecureURL)
+
 	article := models.Article{
 		Title:       request.Title,
-		Image:       request.Image,
+		Image:       resp.SecureURL,
 		Description: request.Description,
 		UserID:      request.UserID,
 	}
